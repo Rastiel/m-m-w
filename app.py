@@ -16,5 +16,5 @@ def verify():
 @app.route("/", methods=["POST"])
 def receive_message():
     payload = request.get_json()
-    print("📩 Gelen mesaj:", payload)
+    print("📩 Gelen mesaj:", payload)  # Gelen mesajı logluyoruz
     return "OK", 200
