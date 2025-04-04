@@ -13,8 +13,9 @@ FB_ACCESS_TOKEN = os.getenv('FB_ACCESS_TOKEN')
 app = Flask(__name__)
 
 # Webhook doğrulaması için gerekli route
-@app.route('/test', methods=['GET'])
+@app.route('/', methods=['GET'])
 def verify():
+    print("ab2")
     # Facebook'un Webhook doğrulama işlemi için gerekli parametreleri alıyoruz
     verify_token = os.getenv('VERIFY_TOKEN')  # .env dosyasındaki VERIFY_TOKEN'i kullanıyoruz
     challenge = request.args.get('hub.challenge')
@@ -29,8 +30,9 @@ def verify():
         return 'Invalid verification token', 403
 
 # Webhook'tan gelen mesajları işlemek için POST route'u
-@app.route('/')
+@app.route('/', methods=['POST'])
 def webhook():
+    print("ab1")
     data = request.json
     #with open("posted.log", "w") as fs:
     #     fs.write(json.dumps(request.json))
