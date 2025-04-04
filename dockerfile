@@ -7,4 +7,4 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--log-syslog", "True", "--access-logfile", "-", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--log-syslog", "True", "--capture-output", "--access-logfile", "-", "app:app"]
