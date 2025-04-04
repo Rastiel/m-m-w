@@ -3,6 +3,7 @@ from logging import handlers
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import requests
+from sys import stdout
 
 # .env dosyasındaki bilgileri yükle
 load_dotenv()
@@ -13,8 +14,12 @@ FB_ACCESS_TOKEN = os.getenv('FB_ACCESS_TOKEN')
 # Uygulama Başlatma
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename='myapp.log', level=logging.INFO)
-logger.info('Started')
+logger.setLevel(logging.DEBUG) # set logger level
+logFormatter = logging.Formatter\
+("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
+consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
 
 # Webhook doğrulaması için gerekli route
 @app.route('/', methods=['GET'])
