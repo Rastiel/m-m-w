@@ -22,8 +22,10 @@ def verify():
 
     # Eğer verify token doğruysa, challenge'ı döndürüyoruz
     if token == verify_token:
+        print("not ok")
         return challenge
     else:
+        print("ok")
         return 'Invalid verification token', 403
 
 # Webhook'tan gelen mesajları işlemek için POST route'u
@@ -49,7 +51,7 @@ def webhook():
 
 # Facebook'a mesaj göndermek için bir yardımcı fonksiyon
 def send_message(sender_id, message_text):
-    url = f"https://graph.facebook.com/v12.0/me/messages?access_token={FB_ACCESS_TOKEN}"
+    url = f"https://graph.facebook.com/v21.0/me/messages?access_token={FB_ACCESS_TOKEN}"
     headers = {'Content-Type': 'application/json'}
     payload = {
         "recipient": {"id": sender_id},
