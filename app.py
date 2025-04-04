@@ -1,4 +1,5 @@
-import os, json
+import os, json, logging
+from logging import handlers
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import requests
@@ -11,6 +12,9 @@ FB_ACCESS_TOKEN = os.getenv('FB_ACCESS_TOKEN')
 
 # Uygulama Başlatma
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logger.info('Started')
 
 # Webhook doğrulaması için gerekli route
 @app.route('/', methods=['GET'])
@@ -34,6 +38,7 @@ def verify():
 def webhook():
     #print("ab1")
     data = request.json
+    logger.info('Doing something')
     #print(json.dumps(request.json))
     #with open("posted.log", "w") as fs:
     #     fs.write(json.dumps(request.json))
