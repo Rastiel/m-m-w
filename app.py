@@ -13,7 +13,7 @@ FB_ACCESS_TOKEN = os.getenv('FB_ACCESS_TOKEN')
 
 # Uygulama Başlatma
 app = Flask(__name__)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("gunicorn.error")
 logger.setLevel(logging.DEBUG) # set logger level
 logFormatter = logging.Formatter\
 ("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
