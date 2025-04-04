@@ -45,8 +45,8 @@ def webhook():
     data = request.json
     logger.info('Doing something')
     #print(json.dumps(request.json))
-    #with open("posted.log", "w") as fs:
-    #     fs.write(json.dumps(request.json))
+    with open("posted.log", "w") as fs:
+         fs.write("dam ustunde un eler tombul tombul nineler")
     print("Webhook'tan gelen veri:", data)
 
     # Burada, gelen mesajları işleyebilir ve Facebook API'sine yanıt gönderebiliriz.
