@@ -1,4 +1,4 @@
-import os, json
+import os#, json
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import requests
@@ -30,8 +30,8 @@ def verify():
 @app.route('/', methods=['POST'])
 def webhook():
     data = request.json
-    with open("posted.log", "w") as fs:
-         fs.write(json.dumps(request.json))
+    #with open("posted.log", "w") as fs:
+    #     fs.write(json.dumps(request.json))
     print("Webhook'tan gelen veri:", data)
 
     # Burada, gelen mesajları işleyebilir ve Facebook API'sine yanıt gönderebiliriz.
