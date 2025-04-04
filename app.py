@@ -1,4 +1,4 @@
-import os#, json
+import os, json
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import requests
@@ -23,17 +23,18 @@ def verify():
 
     # Eğer verify token doğruysa, challenge'ı döndürüyoruz
     if token == verify_token:
-        print("not ok")
+        print("ok")
         return challenge
     else:
-        print("ok")
+        print("not ok")
         return 'Invalid verification token', 403
 
 # Webhook'tan gelen mesajları işlemek için POST route'u
 @app.route('/', methods=['POST'])
 def webhook():
-    print("ab1")
+    #print("ab1")
     data = request.json
+    #print(json.dumps(request.json))
     #with open("posted.log", "w") as fs:
     #     fs.write(json.dumps(request.json))
     print("Webhook'tan gelen veri:", data)
@@ -42,12 +43,13 @@ def webhook():
     # Örnek olarak, gelen mesajı yanıtlıyoruz:
     if 'entry' in data:
         for entry in data['entry']:
-            for messaging in entry['messaging']:
-                sender_id = messaging['sender']['id']
-                message_text = messaging['message']['text']
-                
-                # Facebook'a mesaj göndermek için bir API isteği yapıyoruz.
-                send_message(sender_id, message_text)
+            if 'messaging' in entry:
+                for messaging in entry['messaging']:
+                    sender_id = messaging['sender']['id']
+                    message_text = messaging['message']['text']
+                    
+                    # Facebook'a mesaj göndermek için bir API isteği yapıyoruz.
+                    send_message(sender_id, message_text)
 
     return "EVENT_RECEIVED", 200
 
