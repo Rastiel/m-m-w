@@ -73,7 +73,7 @@ def send_message(sender_id, message_text):
 
     payload = {
         "recipient": {"id": sender_id},
-        "message": {"text": f"Mesajınızı aldım: {message_text}"}
+        "message": {"text": f"dedinki: {message_text}"}
     }
 
     # Facebook'a POST isteği gönder
