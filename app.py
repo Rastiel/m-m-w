@@ -1,79 +1,87 @@
-import os, json, logging
-from logging import handlers
-from flask import Flask, request, jsonify
+import os
+import json
+import logging
+from logging.handlers import RotatingFileHandler
+from flask import Flask, request
 from dotenv import load_dotenv
 import requests
-from sys import stdout
+from datetime import datetime
 
-# .env dosyasındaki bilgileri yükle
+# .env dosyasındaki ortam değişkenlerini yükle
 load_dotenv()
 
-# Facebook Access Token'ı .env dosyasından al
+# Facebook Access Token ve Doğrulama Token'larını ortamdan al
 FB_ACCESS_TOKEN = os.getenv('FB_ACCESS_TOKEN')
+VERIFY_TOKEN = os.getenv('VERIFY_TOKEN', 'rastiel_token')
 
-# Uygulama Başlatma
+# Flask uygulamasını başlat
 app = Flask(__name__)
-logger = logging.getLogger("gunicorn.error")
-logger.setLevel(logging.DEBUG) # set logger level
-logFormatter = logging.Formatter\
-("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
-consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
-consoleHandler.setFormatter(logFormatter)
-logger.addHandler(consoleHandler)
 
-# Webhook doğrulaması için gerekli route
+# Log klasörü ve dosyasını tanımla
+log_folder = "/root/m-m-w/log"
+os.makedirs(log_folder, exist_ok=True)  # klasör yoksa oluştur
+log_path = os.path.join(log_folder, "log.txt")
+
+# Logging yapılandırması: log.txt dosyasına yazacak şekilde ayarlanır
+logger = logging.getLogger("webhook_logger")
+logger.setLevel(logging.INFO)
+
+# RotatingFileHandler sayesinde log dosyası 5MB’yi geçince döner
+handler = RotatingFileHandler(log_path, maxBytes=5*1024*1024, backupCount=5)
+
+# Log formatı: tarih, seviye, mesaj
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+# GET isteği ile Facebook Webhook doğrulaması
 @app.route('/', methods=['GET'])
 def verify():
-    print("ab2")
-    # Facebook'un Webhook doğrulama işlemi için gerekli parametreleri alıyoruz
-    verify_token = os.getenv('VERIFY_TOKEN')  # .env dosyasındaki VERIFY_TOKEN'i kullanıyoruz
     challenge = request.args.get('hub.challenge')
     token = request.args.get('hub.verify_token')
 
-    # Eğer verify token doğruysa, challenge'ı döndürüyoruz
-    if token == verify_token:
-        print("ok")
+    if token == VERIFY_TOKEN:
+        logger.info("Webhook doğrulama başarılı.")
         return challenge
     else:
-        print("not ok")
+        logger.warning("Webhook doğrulama başarısız. Yanlış token.")
         return 'Invalid verification token', 403
 
-# Webhook'tan gelen mesajları işlemek için POST route'u
+# POST isteği ile gelen mesajları yakalayıp işleyen webhook endpoint
 @app.route('/', methods=['POST'])
 def webhook():
-    #print("ab1")
     data = request.json
-    logger.info('Doing something')
-    #print(json.dumps(request.json))
-    with open("posted.log", "w") as fs:
-         fs.write("dam ustunde un eler tombul tombul nineler")
-    print("Webhook'tan gelen veri:", data)
 
-    # Burada, gelen mesajları işleyebilir ve Facebook API'sine yanıt gönderebiliriz.
-    # Örnek olarak, gelen mesajı yanıtlıyoruz:
+    # Gelen isteği log dosyasına detaylı şekilde kaydet
+    logger.info(f"[{request.remote_addr}] {request.method} {request.path} - Gelen veri: {json.dumps(data)}")
+
+    # Facebook mesaj içeriğini ayıklayıp cevap gönder
     if 'entry' in data:
         for entry in data['entry']:
             if 'messaging' in entry:
                 for messaging in entry['messaging']:
                     sender_id = messaging['sender']['id']
                     message_text = messaging['message']['text']
-                    
-                    # Facebook'a mesaj göndermek için bir API isteği yapıyoruz.
                     send_message(sender_id, message_text)
 
     return "EVENT_RECEIVED", 200
 
-# Facebook'a mesaj göndermek için bir yardımcı fonksiyon
+# Facebook'a cevap mesajı gönderen yardımcı fonksiyon
 def send_message(sender_id, message_text):
     url = f"https://graph.facebook.com/v21.0/me/messages?access_token={FB_ACCESS_TOKEN}"
     headers = {'Content-Type': 'application/json'}
+
     payload = {
         "recipient": {"id": sender_id},
         "message": {"text": f"Mesajınızı aldım: {message_text}"}
     }
 
+    # Facebook'a POST isteği gönder
     response = requests.post(url, json=payload, headers=headers)
-    print(f"Facebook'a gönderilen cevap: {response.text}")
 
+    # Cevabı log dosyasına kaydet
+    logger.info(f"Facebook'a gönderilen cevap: {response.text}")
+
+# Uygulama doğrudan çalıştırıldığında başlatılacak sunucu (geliştirme için)
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=10000)
