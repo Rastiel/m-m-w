@@ -18,7 +18,7 @@ VERIFY_TOKEN = os.getenv('VERIFY_TOKEN', 'rastiel_token')
 app = Flask(__name__)
 
 # Log klasörü ve dosyasını tanımla
-log_folder = "/root/m-m-w/log"
+log_folder = "log"
 os.makedirs(log_folder, exist_ok=True)  # klasör yoksa oluştur
 log_path = os.path.join(log_folder, "log.txt")
 
