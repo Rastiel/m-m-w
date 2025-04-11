@@ -3,6 +3,9 @@
 echo "Kodlar GitHub'dan çekiliyor..."
 git pull origin main || { echo " Git pull başarısız"; exit 1; }
 
+echo " Ortam dosyası hazırlanıyor..."
+cp .env.example .env || { echo " .env dosyası kopyalanamadı"; exit 1; }
+
 echo " Docker imajı oluşturuluyor (cache'siz)..."
 docker build --no-cache -t m-m-w . || { echo " Docker build başarısız"; exit 1; }
 
