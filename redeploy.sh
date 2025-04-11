@@ -13,7 +13,6 @@ echo " Eski container siliniyor (varsa)..."
 docker rm m-m-w || true
 
 echo " Yeni container başlatılıyor..."
-docker run -d -p 10000:10000 -v ./log:/app/log --env-file .env --name m-m-w m-m-w
- || { echo "❌ Docker run başarısız"; exit 1; }
+docker run -d -p 10000:10000 -v ./log:/app/log --env-file .env --name m-m-w m-m-w || { echo "❌ Docker run başarısız"; exit 1; }
 
 echo " Başarıyla güncellendi ve çalışıyor."
