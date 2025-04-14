@@ -22,6 +22,8 @@ DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
+PORT = int(os.getenv("PORT", 10000))
+
 app = Flask(__name__)
 
 # Logging ayarları
@@ -77,7 +79,7 @@ def log_message(direction, sender_id, recipient_id, platform, message_text):
         logger.error(f"❌ Veritabanı loglama hatası: {e}")
 
 # Webhook doğrulama endpoint
-@app.route('/', methods=['GET'])
+@app.route('/webhook', methods=['GET'])
 def verify():
     challenge = request.args.get('hub.challenge')
     token = request.args.get('hub.verify_token')
@@ -86,7 +88,7 @@ def verify():
     return 'Invalid verification token', 403
 
 # Webhook mesaj alma endpoint
-@app.route('/', methods=['POST'])
+@app.route('/webhook', methods=['POST'])
 def webhook():
     data = request.json
     logger.info(f"Gelen veri: {json.dumps(data)}")
@@ -121,4 +123,4 @@ def send_message(sender_id, message_text):
 
 # Sunucu çalıştır
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=10000)
+    app.run(debug=True, host='0.0.0.0', port=PORT)
